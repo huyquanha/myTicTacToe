@@ -1,0 +1,45 @@
+A note on ReactJS's Immutability:
+
+There are 2 ways to change data in ReactJS: by modifying the data directly, or by creating a new copy with the desired changes and replace the old one
+
+The second approach is more favorable because:
+	Avoid direct data mutation let us save the previous versions of data for later used
+	Easier to detect changes. If the immutable objects being referenced is different than the previous one, then the object has changed.
+	Instead if you modify data directly, not only you have to check with the previous version, you have to traverse the whole
+	object tree.
+	Immutable data can easily determine if changes have been made which helps to determine when a component requires re-rendering.
+	
+Functional component:
+	Simpler way to write components that only contains a render() method without any state
+	In the example provided, Square does not need its own state => we can change it to a functional component
+	
+	When we modified the Square to be a functional component, we also changed onClick={() => this.props.onClick()} to a shorter onClick={props.onClick} (note the lack of parentheses on both sides). In a class, we used an arrow function to access the correct this value, but in a functional component we don’t need to worry about this.
+	
+Note on key:
+	<li key={user.id}>{user.name}: {user.taskCount} tasks left</li>
+	
+	Key is a special and reserved property in React (along with ref, a more advanced feature). 
+	When an element is created, React extracts the key property and stores the key directly on the returned element. 
+	Even though key may look like it belongs in props, key cannot be referenced using this.props.key. 
+	React automatically uses key to decide which components to update. A component cannot inquire about its key.
+	
+	Key is needed so React can determine what has changed
+		Ex: when a list is re-rendered, React search for the key of each element in the new list in the previous list
+			If it can't find the key in the old list => new key => insert a new element to the list
+			If current list is missing a key that existed in previous list => react deletes that element
+			If a component's key changes, the component will be destroyed and re-created with a new state
+	
+	Key is strongly recommended if you build a dynamic list
+
+Note on the onClick() process:
+   - At the start, when Game is rendered, it renders the Board, passes its current squares array and an onClick listener (
+   which it already registers a handleClick(i) method to listen to) down to Board
+   - Board passes each individual value in the squares array to form the value of the corresponding Square, and passes
+   the onClick listener down to Square
+   - Square contains a button, whose value is set by props.value from Board, and onClick is handled by props.onClick from Board
+
+   - When user clicks on a square, the button listens to the event first. It calls the props.onClick handler
+   - Square's props is provided by Board. So, Board handles this call by calling its own props.onClick handler, but also passing
+   the integer i upward, signifying which Square does the call originates from
+   - Board's props is provided by Game. So, Game handles this call by calling its registered function: handleClick(i), provided with
+   i from the Board.
